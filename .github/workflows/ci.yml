@@ -1,0 +1,118 @@
+name: Benchmark CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  lint-and-import:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install tonic torchaudio h5py numpy matplotlib
+
+      - name: Verify all modules import
+        run: |
+          python -c "from common.neurons import LIFNeuron, AdaptiveLIFNeuron, ConvLIFLayer, surrogate_spike; print('neurons OK')"
+          python -c "from common.training import train_epoch, evaluate, run_training; print('training OK')"
+          python -c "from common.deploy import quantize_weights, compute_hardware_params; print('deploy OK')"
+          python -c "from common.augmentation import event_drop, time_stretch, spatial_jitter; print('augmentation OK')"
+          python -c "from common import LIFNeuron, AdaptiveLIFNeuron; print('common __init__ OK')"
+
+      - name: Syntax check all scripts
+        run: |
+          python -m py_compile shd/train.py
+          python -m py_compile shd/loader.py
+          python -m py_compile shd/deploy.py
+          python -m py_compile nmnist/train.py
+          python -m py_compile nmnist/loader.py
+          python -m py_compile nmnist/deploy.py
+          python -m py_compile ssc/train.py
+          python -m py_compile ssc/loader.py
+          python -m py_compile ssc/deploy.py
+          python -m py_compile dvs_gesture/train.py
+          python -m py_compile dvs_gesture/loader.py
+          python -m py_compile dvs_gesture/deploy.py
+          python -m py_compile gsc_kws/train.py
+          python -m py_compile gsc_kws/loader.py
+          python -m py_compile gsc_kws/deploy.py
+          python -m py_compile neurobench/submit.py
+          python -m py_compile sweep.py
+          echo "All scripts compile OK"
+
+      - name: Test neuron forward pass
+        run: |
+          python -c "
+          import torch
+          from common.neurons import LIFNeuron, AdaptiveLIFNeuron
+
+          # Test LIF
+          lif = LIFNeuron(64)
+          x = torch.randn(8, 64)
+          v = torch.zeros(8, 64)
+          v_new, spk = lif(x, v)
+          assert v_new.shape == (8, 64), f'LIF v shape: {v_new.shape}'
+          assert spk.shape == (8, 64), f'LIF spk shape: {spk.shape}'
+          print(f'LIF: v={v_new.mean():.4f}, spikes={spk.sum():.0f}')
+
+          # Test adLIF
+          adlif = AdaptiveLIFNeuron(64)
+          a = torch.zeros(8, 64)
+          v_new, spk, a_new = adlif(x, v, a, torch.zeros(8, 64))
+          assert v_new.shape == (8, 64), f'adLIF v shape: {v_new.shape}'
+          assert a_new.shape == (8, 64), f'adLIF a shape: {a_new.shape}'
+          print(f'adLIF: v={v_new.mean():.4f}, a={a_new.mean():.4f}, spikes={spk.sum():.0f}')
+
+          print('All neuron tests passed')
+          "
+
+      - name: Test quantization
+        run: |
+          python -c "
+          import numpy as np
+          from common.deploy import quantize_weights
+
+          w = np.random.randn(20, 512).astype(np.float32) * 0.1
+          w_q = quantize_weights(w, threshold_float=1.0, threshold_hw=1000)
+          assert w_q.shape == (512, 20), f'Expected (512,20), got {w_q.shape}'
+          assert w_q.dtype == np.int32
+          assert w_q.min() >= -32768
+          assert w_q.max() <= 32767
+          print(f'Quantization: range [{w_q.min()}, {w_q.max()}], shape {w_q.shape}')
+          print('Quantization test passed')
+          "
+
+      - name: Test augmentation
+        run: |
+          python -c "
+          import torch
+          from common.augmentation import event_drop, time_stretch, spatial_jitter
+
+          x = torch.rand(4, 100, 700)
+          y = event_drop(x)
+          assert y.shape == x.shape, f'event_drop shape: {y.shape}'
+
+          y = time_stretch(x, factor_range=(0.9, 1.1))
+          assert y.shape == x.shape, f'time_stretch shape: {y.shape}'
+
+          x_dvs = torch.rand(4, 20, 2048)
+          y = spatial_jitter(x_dvs, sigma=1.0, spatial_dims=(32, 32))
+          assert y.shape == x_dvs.shape, f'spatial_jitter shape: {y.shape}'
+
+          print('All augmentation tests passed')
+          "

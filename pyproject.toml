@@ -1,0 +1,36 @@
+[project]
+name = "catalyst-benchmarks"
+version = "1.0.0"
+description = "Benchmark suite for Catalyst neuromorphic processors — SHD, SSC, N-MNIST, DVS Gesture, GSC/KWS"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Henry Shulayev Barnes", email = "henry@catalyst-neuromorphic.com"},
+]
+keywords = ["neuromorphic", "snn", "spiking-neural-network", "benchmark", "fpga"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+]
+
+dependencies = [
+    "torch>=2.0",
+    "tonic>=0.5.0",
+    "h5py",
+    "numpy",
+    "matplotlib",
+]
+
+[project.optional-dependencies]
+gsc = ["speech2spikes>=0.4.0"]
+neurobench = ["neurobench>=1.0.0"]
+all = ["speech2spikes>=0.4.0", "neurobench>=1.0.0"]
+
+[project.urls]
+Homepage = "https://catalyst-neuromorphic.com"
+Repository = "https://github.com/catalyst-neuromorphic/catalyst-benchmarks"
+Documentation = "https://github.com/catalyst-neuromorphic/catalyst-benchmarks#readme"

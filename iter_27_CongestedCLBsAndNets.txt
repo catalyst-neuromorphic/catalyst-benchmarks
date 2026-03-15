@@ -1,0 +1,27 @@
+List of CLB Tiles
+CLEM_R_X41Y1
+CLEL_R_X41Y1
+CLEM_R_X41Y107
+CLEL_R_X41Y107
+CLEM_R_X41Y112
+CLEL_R_X41Y112
+CLEL_L_X40Y100
+CLEL_R_X40Y100
+CLEL_L_X40Y205
+CLEL_R_X40Y205
+CLEL_R_X35Y226
+CLEM_X32Y56
+CLEL_R_X32Y56
+CLEM_X30Y71
+CLEM_X30Y147
+CLEM_X29Y71
+CLEL_R_X29Y71
+
+List of Congested Nets
+u_n3/u_chip/gen_row[0].gen_col[0].tile_inst/gen_core[1].tdm_en.u_tdm/batch_mem_reg_n_0_[419][2]
+u_n3/u_chip/gen_row[0].gen_col[0].tile_inst/gen_core[1].tdm_en.u_tdm/batch_mem_reg_n_0_[418][2]
+u_n3/u_chip/gen_row[0].gen_col[0].tile_inst/gen_core[1].core_inst/u_neuron_update/sd_delta_abs0[12]
+u_n3/u_chip/gen_row[0].gen_col[0].tile_inst/gen_core[1].core_inst/u_neuron_update/i___142_n_0
+u_n3/u_chip/gen_row[0].gen_col[0].tile_inst/gen_core[1].core_inst/trace_fifo_mem_reg[24]_473[4]
+u_n3/u_chip/gen_row[0].gen_col[0].tile_inst/gen_core[1].core_inst/trace_fifo_mem_reg[27]_470[4]
+

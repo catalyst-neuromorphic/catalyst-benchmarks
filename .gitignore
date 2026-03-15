@@ -1,0 +1,46 @@
+# Data
+data/
+*.h5
+*.h5.gz
+
+# Checkpoints
+*.pt
+*.pth
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Output
+neurobench_results.json
+checkpoints/
+
+# Training logs
+*.log
+
+# Temp scripts
+watch_and_launch*.sh
+
+# Internal
+marketing/
+TRAINING_LOG.md
+
+# Vivado
+*.jou
+*.backup.jou
