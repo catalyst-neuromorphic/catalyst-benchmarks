@@ -8,7 +8,7 @@ Official benchmark suite for [Catalyst neuromorphic processors](https://catalyst
 
 All results are reproducible. Clone, install, train, deploy.
 
-## Results — Catalyst N3 (Latest)
+## Results: Catalyst N3 (Latest)
 
 | Benchmark | Classes | Architecture | Neuron | Float Acc | Params |
 |-----------|---------|-------------|--------|-----------|--------|
@@ -20,7 +20,7 @@ All results are reproducible. Clone, install, train, deploy.
 
 All N3 models use adaptive LIF neurons with surrogate gradient BPTT and cosine LR scheduling.
 
-## Results — Catalyst N2
+## Results: Catalyst N2
 
 | Benchmark | Classes | Architecture | Neuron | Float Acc | Params |
 |-----------|---------|-------------|--------|-----------|--------|
@@ -32,7 +32,7 @@ All N3 models use adaptive LIF neurons with surrogate gradient BPTT and cosine L
 
 All N2 models deploy to Catalyst N2 FPGA hardware via int16 weight quantization.
 
-## Results — Catalyst N1
+## Results: Catalyst N1
 
 | Benchmark | Classes | Architecture | Neuron | Float Acc | Params |
 |-----------|---------|-------------|--------|-----------|--------|
@@ -41,7 +41,7 @@ All N2 models deploy to Catalyst N2 FPGA hardware via int16 weight quantization.
 | **DVS Gesture** | 11 | Deep conv+rec | LIF | **69.7%** | ~1.2M |
 | **GSC-12** | 12 | 40→512→12 (rec, S2S) | LIF | **86.4%** | 291K |
 
-N1 uses basic LIF neurons only (no adaptation). Demonstrates competitive performance through model capacity alone — the N2's adaptive threshold provides a clear efficiency advantage at matched model sizes.
+N1 uses basic LIF neurons only (no adaptation). Demonstrates competitive performance through model capacity alone. The N2's adaptive threshold provides a clear efficiency advantage at matched model sizes.
 
 ## Competitive Context
 
@@ -50,9 +50,9 @@ Loihi 2 results from [Mészáros et al. 2025](https://arxiv.org/abs/2510.13757) 
 | Benchmark | Catalyst N3 | Catalyst N2 | Catalyst N1 | Loihi 2 |
 |-----------|-------------|-------------|-------------|---------|
 | SHD | **91.0%** | 84.5% | 90.6% | 90.9% |
-| SSC | **76.4%** | 72.1% | — | 69.8% |
-| N-MNIST | **99.1%** | 97.8% | — | — |
-| GSC-12 | **88.0%** | 88.0% | — | — |
+| SSC | **76.4%** | 72.1% | - | 69.8% |
+| N-MNIST | **99.1%** | 97.8% | - | - |
+| GSC-12 | **88.0%** | 88.0% | - | - |
 
 ## FPGA Hardware Characterisation
 
@@ -66,11 +66,11 @@ Loihi 2 results from [Mészáros et al. 2025](https://arxiv.org/abs/2510.13757) 
 
 ### AWS F2 Cloud FPGA (Xilinx VU47P)
 
-| Processor | Tests | Pass Rate | Throughput | Frequency |
-|-----------|-------|-----------|------------|-----------|
-| N1 | — | PASS | — | 62.5 MHz |
-| N2 | 28/28 | 100% | 8,690 ts/sec | 62.5 MHz |
-| N3 | 19/19 | 100% | 14,512 ts/sec | 62.5 MHz |
+| Processor | Status | Throughput | Frequency |
+|-----------|--------|------------|-----------|
+| N1 | PASS | - | 62.5 MHz |
+| N2 | PASS | 8,690 ts/sec | 62.5 MHz |
+| N3 | PASS | 14,512 ts/sec | 62.5 MHz |
 
 ## Quick Start
 
@@ -83,16 +83,16 @@ pip install -e .
 ### Train a benchmark
 
 ```bash
-# SHD (Spiking Heidelberg Digits) — 91.0% with N3 adLIF
+# SHD (Spiking Heidelberg Digits), 91.0% with N3 adLIF
 python shd/train.py --neuron adlif --hidden 1536 --epochs 200 --device cuda:0 --amp
 
-# SSC (Spiking Speech Commands) — 76.4% with N3 adLIF
+# SSC (Spiking Speech Commands), 76.4% with N3 adLIF
 python ssc/train.py --hidden1 1024 --hidden2 768 --recurrent2 --epochs 70 --device cuda:0 --amp
 
-# N-MNIST — 99.1% with Conv front-end
+# N-MNIST, 99.1% with Conv front-end
 python nmnist/train.py --data-dir data/nmnist --epochs 80 --device cuda:0 --amp
 
-# Google Speech Commands (KWS) — 88.0% with Speech2Spikes encoding
+# Google Speech Commands (KWS), 88.0% with Speech2Spikes encoding
 python gsc_kws/train.py --hidden 512 --dropout 0.3 --epochs 200 --device cuda:0 --amp
 ```
 
@@ -142,7 +142,7 @@ All models use surrogate gradient backpropagation through time (BPTT) with
 a fast-sigmoid surrogate gradient. The key neuron models are:
 
 - **LIF**: Leaky Integrate-and-Fire with multiplicative decay. Maps to CUBA hardware neuron via `decay_v = round(beta * 4096)`.
-- **adLIF**: Adaptive LIF with Symplectic Euler discretization. Updates adaptation *before* threshold computation for richer temporal dynamics. Adaptation is training-only; only membrane decay deploys to hardware.
+- **adLIF**: Adaptive LIF with Symplectic Euler discretization. Updates adaptation *before* threshold computation for richer temporal dynamics. Adaptation is training-only, and only membrane decay deploys to hardware.
 
 Weight quantization: `weight_hw = round(w_float * threshold_hw / threshold_float)`, clamped to int16 range.
 
@@ -159,7 +159,7 @@ catalyst-benchmarks/
 ├── ssc/                 Spiking Speech Commands (35 classes, 700ch)
 ├── nmnist/              Neuromorphic MNIST (10 classes, 34x34 DVS)
 ├── gsc_kws/             Google Speech Commands keyword spotting (12 classes, S2S)
-├── dvs_gesture/         DVS128 Gesture (11 classes, 128x128 DVS) — in progress
+├── dvs_gesture/         DVS128 Gesture (11 classes, 128x128 DVS), in progress
 ├── results.json         Machine-readable benchmark results
 └── pyproject.toml       Dependencies and project metadata
 ```
